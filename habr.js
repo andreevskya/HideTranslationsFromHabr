@@ -1,17 +1,35 @@
-var numBlocked = 0; 
+function getArticleRating(item) {
+    var counter = item.querySelector(".post-stats__result-counter");
+    if (!counter) {
+        return undefined;
+    }
+    return parseInt(counter.textContent.trim().replace("–", "-"));
+}
+
+function notifyUser(text) {
+    browser.runtime.sendMessage(text);
+}
+
+var numBlocked = 0;
 document.querySelectorAll(".post")
     .forEach(function(item, index) {
-                item.querySelectorAll(".post__type-label")
-                .forEach(function(item2, index2) {
-	                if(item2.title == "Перевод") {
-		                item.remove();
-		                ++numBlocked;
-	                }
-                });
+        var rating = getArticleRating(item);
+        if(rating < 0) {
+            titleLink = item.querySelector(".post__title_link");
+            item.remove();
+            notifyUser("Скрыта статья \"" + titleLink.textContent + "\" (рейтинг " + rating + ")");
+            return;
+        }
+        item.querySelectorAll(".post__type-label").forEach(function(item2, index2) {
+            if (item2.title == "Перевод") {
+                item.remove();
+                ++numBlocked;
+            }
+        });
     });
-    
-if(numBlocked > 0) {
-    browser.runtime.sendMessage(numBlocked + " переводов заблочено");
+
+if (numBlocked > 0) {
+    notifyUser(numBlocked + " переводов заблочено");
 } else {
-    browser.runtime.sendMessage("Переводов нет");
-}
+    notifyUser("Переводов нет");
+};
