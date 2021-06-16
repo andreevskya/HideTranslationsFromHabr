@@ -15,10 +15,15 @@ document.querySelectorAll(".post")
     .forEach(function(item, index) {
         var rating = getArticleRating(item);
         if(rating < 0) {
-            titleLink = item.querySelector(".post__title_link");
-            item.remove();
-            notifyUser("Скрыта статья \"" + titleLink.textContent + "\" (рейтинг " + rating + ")");
-            return;
+            titleLink = item.querySelector(".post__title_link") || item.querySelector(".preview-data__title-link");
+            if(titleLink) {
+                item.remove();
+                notifyUser("Скрыта статья \"" + titleLink.textContent + "\" (рейтинг " + rating + ")");
+                return;
+            } else {
+                notifyUser("Failed to hide article with negative score");
+                return
+            }
         }
         item.querySelectorAll(".post__type-label").forEach(function(item2, index2) {
             if (item2.title == "Перевод") {
