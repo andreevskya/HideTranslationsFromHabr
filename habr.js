@@ -1,5 +1,9 @@
 function getArticleRating(item) {
-    var counter = item.querySelector(".post-stats__result-counter");
+    var counterContainer = item.querySelector(".tm-votes-meter");
+    if(!counterContainer) {
+        return undefined;
+    }
+    var counter = counterContainer.querySelector(".tm-votes-meter__value");
     if (!counter) {
         return undefined;
     }
@@ -11,24 +15,31 @@ function notifyUser(text) {
 }
 
 var numBlocked = 0;
-document.querySelectorAll(".post")
+document.querySelectorAll(".tm-articles-list__item")
     .forEach(function(item, index) {
         var rating = getArticleRating(item);
         if(rating < 0) {
-            titleLink = item.querySelector(".post__title_link") || item.querySelector(".preview-data__title-link");
+            titleLink = item.querySelector(".tm-article-snippet__title-link");
             if(titleLink) {
                 item.remove();
-                notifyUser("Скрыта статья \"" + titleLink.textContent + "\" (рейтинг " + rating + ")");
+                notifyUser("Скрыта статья \"" + titleLink.firstChild.innerHTML + "\" (рейтинг " + rating + ")");
                 return;
             } else {
                 notifyUser("Failed to hide article with negative score");
                 return
             }
         }
-        item.querySelectorAll(".post__type-label").forEach(function(item2, index2) {
-            if (item2.title == "Перевод") {
-                item.remove();
-                ++numBlocked;
+        item.querySelectorAll(".tm-article-snippet__label").forEach(function(item2, index2) {
+            var spans = item2.querySelectorAll("span");
+            if(!spans) {
+                return;
+            }
+            for(var i = 0; i < spans.length; ++i) {
+                if(spans[i].innerHTML.trim() == "Перевод") {
+                    item.remove();
+                    ++numBlocked;
+                    return;
+                }
             }
         });
     });
