@@ -14,7 +14,7 @@
   },
   "content_scripts": [
     {
-      "matches": ["*://*.habr.com/ru", "*://*.habr.com/ru/all*", "*://*.habr.com/ru/page*"],
+      "matches": ["*://habr.com/ru/all*", "*://habr.com/ru/top*"],
       "js": ["habr.js"]
     }
   ]
